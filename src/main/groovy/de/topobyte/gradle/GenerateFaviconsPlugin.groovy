@@ -30,7 +30,7 @@ class GenerateFaviconsPlugin implements Plugin<Project> {
                 for (size in sizes) {
                     def filename = String.format(out, size)
                     def file = subdir.resolve(filename)
-                    if (Files.getLastModifiedTime(file) < Files.getLastModifiedTime(svg)) {
+                    if (!Files.exists(file) || Files.getLastModifiedTime(file) < Files.getLastModifiedTime(svg)) {
                         println 'Generate icon: ' + file
                         project.exec {
                             commandLine = 'inkscape'
@@ -50,7 +50,7 @@ class GenerateFaviconsPlugin implements Plugin<Project> {
                     def file = subdir.resolve(filename)
                     icoFiles << file.toString()
                 }
-                if (Files.getLastModifiedTime(icoFile) < Files.getLastModifiedTime(svg)) {
+                if (!Files.exists(icoFile) || Files.getLastModifiedTime(icoFile) < Files.getLastModifiedTime(svg)) {
                     project.exec {
                         println 'Generate icon: ' + icoFile
                         commandLine = 'convert'
