@@ -20,8 +20,11 @@ class GenerateFaviconsPlugin implements Plugin<Project> {
                 }
                 println "Generating favicons from input file ${extension.input}"
 
-                def svg = Paths.get(extension.input)
-                def dir = project.buildDir.toPath().resolve('favicons')
+                def projectDir = project.projectDir.toPath();
+                def buildDir = project.buildDir.toPath()
+
+                def svg = projectDir.resolve(extension.input)
+                def dir = buildDir.resolve('favicons')
                 def subdir = dir.resolve('images')
                 Files.createDirectories(dir)
                 Files.createDirectories(subdir)
