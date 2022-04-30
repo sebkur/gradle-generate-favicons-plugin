@@ -5,6 +5,7 @@ wrapper {
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'com.gradle.plugin-publish'
+apply plugin: 'eclipse'
 
 group = pGroup
 version = pVersion
