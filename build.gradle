@@ -1,9 +1,9 @@
 wrapper {
-    gradleVersion = '6.5.1'
+    gradleVersion = '7.4.2'
 }
 
 apply plugin: 'groovy'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'com.gradle.plugin-publish'
 apply plugin: 'eclipse'
 
@@ -33,13 +33,12 @@ buildscript {
 }
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy()
+    implementation gradleApi()
+    implementation localGroovy()
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -64,22 +63,21 @@ artifacts {
     archives sourcesJar
 }
 
-def pomInfo = new XmlSlurper().parse(new File('info.pom'));
+def pomInfo = new XmlSlurper().parse(file('info.pom'));
 
-afterEvaluate { project ->
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                pom.project {
-                    name pomInfo.name
-                    description pomInfo.description
-                    url pomInfo.url
-                    licenses {
-                        license {
-                            name pomInfo.licenseName
-                            url pomInfo.licenseUrl
-                            distribution pomInfo.licenseDistribution
-                        }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            pom {
+                name = "$pomInfo.name"
+                description = "$pomInfo.description"
+                url = "$pomInfo.url"
+                licenses {
+                    license {
+                        name = "$pomInfo.licenseName"
+                        url = "$pomInfo.licenseUrl"
+                        distribution = "$pomInfo.licenseDistribution"
                     }
                 }
             }
