@@ -1,6 +1,7 @@
 package de.topobyte.gradle;
 
 import java.nio.file.Files
+import java.util.regex.Pattern
 
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Plugin
@@ -16,6 +17,30 @@ class GenerateFaviconsPlugin implements Plugin<Project> {
 				if (extension.input == null) {
 					throw new InvalidUserDataException("You need to specify the input file via 'input'")
 				}
+
+				println "Checking installed inkscape version"
+				def major = -1, minor = -1, patch = -1
+				try {
+					def versionOutput = new ByteArrayOutputStream().withStream { os ->
+						def result = project.exec {
+							commandLine = 'inkscape'
+							args = ['--version']
+							standardOutput = os
+						}
+						return os.toString()
+					}
+					def pattern = Pattern.compile("Inkscape (\\d+)\\.(\\d+)\\.(\\d+).*")
+					def matcher = pattern.matcher(versionOutput)
+					if (matcher.find()) {
+						major = Integer.parseInt(matcher.group(1))
+						minor = Integer.parseInt(matcher.group(2))
+						patch = Integer.parseInt(matcher.group(3))
+					}
+				} catch (Throwable e) {
+					throw new IOException("Cannot find inkscape executable")
+				}
+				println "Detected version $major.$minor.$patch"
+
 				println "Generating favicons from input file ${extension.input}"
 
 				def projectDir = project.projectDir.toPath();
@@ -33,16 +58,30 @@ class GenerateFaviconsPlugin implements Plugin<Project> {
 					def file = subdir.resolve(filename)
 					if (!Files.exists(file) || Files.getLastModifiedTime(file) < Files.getLastModifiedTime(svg)) {
 						println 'Generate icon: ' + file
-						project.exec {
-							commandLine = 'inkscape'
-							args = [
-								'-C',
-								'-h',
-								size,
-								'-e',
-								file.toString(),
-								svg
-							]
+						if (major == 0) {
+							project.exec {
+								commandLine = 'inkscape'
+								args = [
+									'-C',
+									'-h',
+									size,
+									'-e',
+									file.toString(),
+									svg
+								]
+							}
+						} else if (major == 1) {
+							project.exec {
+								commandLine = 'inkscape'
+								args = [
+									'-C',
+									'-h',
+									size,
+									'-o',
+									file.toString(),
+									svg
+								]
+							}
 						}
 					} else {
 						println 'Icon is up to date: ' + file
