@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+        maven { url '../../maven-repo' }
+        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'https://mvn.topobyte.de' }
+    }
+    dependencies {
+        classpath 'de.topobyte:gradle-generate-favicons-plugin:0.0.3'
+    }
+}
+
+wrapper {
+    gradleVersion = '6.5.1'
+}
+
+allprojects {
+    group = pGroup
+    version = pVersion
+}
+
+subprojects {
+    repositories {
+        maven {
+            url 'http://mvn.topobyte.de'
+        }
+        maven {
+            url 'http://mvn.slimjars.com'
+        }
+        mavenCentral()
+    }
+}
+
+project(':test-core') {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    apply plugin: 'de.topobyte.generate-favicons-gradle-plugin'
+}
+
+subprojects {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
