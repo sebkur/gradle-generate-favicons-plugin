@@ -84,3 +84,16 @@ publishing {
         }
     }
 }
+
+if (project.hasProperty("publishForTesting")) {
+    publishing {
+        repositories {
+            maven{
+                url = 'maven-repo'
+            }
+        }
+    }
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
+}

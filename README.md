@@ -8,3 +8,9 @@ This software is released under the terms of the GNU Lesser General Public
 License.
 
 See  [LGPL.md](LGPL.md) and [GPL.md](GPL.md) for details.
+
+## Testing
+
+For testing, the artifacts can be published locally:
+
+    ./gradlew -PpublishForTesting publish
