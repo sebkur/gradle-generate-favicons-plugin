@@ -1,4 +1,6 @@
-package de.topobyte.gradle;
+package de.topobyte.gradle
+
+import de.topobyte.os.meta.Software;
 
 import java.nio.file.Files
 import java.util.regex.Pattern
@@ -18,28 +20,11 @@ class GenerateFaviconsPlugin implements Plugin<Project> {
 					throw new InvalidUserDataException("You need to specify the input file via 'input'")
 				}
 
-				println "Checking installed inkscape version"
-				def major = -1, minor = -1, patch = -1
-				try {
-					def versionOutput = new ByteArrayOutputStream().withStream { os ->
-						def result = project.exec {
-							commandLine = 'inkscape'
-							args = ['--version']
-							standardOutput = os
-						}
-						return os.toString()
-					}
-					def pattern = Pattern.compile("Inkscape (\\d+)\\.(\\d+)\\.(\\d+).*")
-					def matcher = pattern.matcher(versionOutput)
-					if (matcher.find()) {
-						major = Integer.parseInt(matcher.group(1))
-						minor = Integer.parseInt(matcher.group(2))
-						patch = Integer.parseInt(matcher.group(3))
-					}
-				} catch (Throwable e) {
+				def inkscape = Software.inkscapeVersionInfo
+				if (!inkscape.installed) {
 					throw new IOException("Cannot find inkscape executable")
 				}
-				println "Detected version $major.$minor.$patch"
+				println "Detected version $inkscape.major.$inkscape.minor.$inkscape.patch"
 
 				println "Generating favicons from input file ${extension.input}"
 
@@ -58,7 +43,7 @@ class GenerateFaviconsPlugin implements Plugin<Project> {
 					def file = subdir.resolve(filename)
 					if (!Files.exists(file) || Files.getLastModifiedTime(file) < Files.getLastModifiedTime(svg)) {
 						println 'Generate icon: ' + file
-						if (major == 0) {
+						if (inkscape.major == 0) {
 							project.exec {
 								commandLine = 'inkscape'
 								args = [
@@ -70,7 +55,7 @@ class GenerateFaviconsPlugin implements Plugin<Project> {
 									svg
 								]
 							}
-						} else if (major == 1) {
+						} else if (inkscape.major == 1) {
 							project.exec {
 								commandLine = 'inkscape'
 								args = [

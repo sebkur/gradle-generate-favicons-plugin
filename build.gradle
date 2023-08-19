@@ -34,11 +34,15 @@ buildscript {
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://mvn.topobyte.de'
+    }
 }
 
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
+    implementation 'de.topobyte:operating-system-meta:0.1.0'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
